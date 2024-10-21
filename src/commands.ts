@@ -1,7 +1,11 @@
+import { AppError } from "./app.error";
 import { Recipe, RecipeType } from "./recipe";
 import { Store } from "./stores/store.type";
 
 export async function list(store: Store<RecipeType[]>, args: string[]) {
+  if(args.length > 0){
+    throw new AppError(`The list command should not have any argument. You entered: "${args}"`);
+  }
   const recipe = new Recipe(store);
   const recipes = await recipe.readAll();
   const formatted = recipes
