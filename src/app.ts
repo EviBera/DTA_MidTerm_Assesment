@@ -5,17 +5,28 @@ import { RecipeType } from './recipe';
 
 type Command = (store: Store<RecipeType[]>, args: string[]) => Promise<void>
 
-export async function createApp(store: Store<RecipeType[]>, args: string[], ) {
+export async function createApp(store: Store<RecipeType[]>, args: string[],) {
   const [, , command, ...restArgs] = args;
-  
+
   const commands: Record<string, Command> = {
     'list': list
   }
 
-  if(command in commands) {
-    const commandFunction = commands[command] 
-    await commandFunction(store, restArgs);
-  } else {
-    throw new AppError(`Unknown command: ${command}`);
+  try {
+    if (command in commands) {
+      const commandFunction = commands[command]
+      await commandFunction(store, restArgs);
+    } else {
+      throw new AppError(`Unknown command: ${command}`);
+    }
+  }
+  catch (err) {
+    let message: string;
+    if (err instanceof AppError) { 
+      message = err.message 
+    } else { 
+      message = String(err);
+    }
+    console.log("Sorry, something went wrong. " + message);
   }
 }
